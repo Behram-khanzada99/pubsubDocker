@@ -17,6 +17,13 @@ spec:
         image: myapp-image:local
         ports:
         - containerPort: 8080
+        resources:
+          limits:
+            cpu: "0.5"  # Maximum of 0.5 CPU cores
+            memory: "512Mi"  # Maximum of 512 megabytes
+          requests:
+            cpu: "0.2"  # Initial request of 0.2 CPU cores
+            memory: "256Mi"  # Initial request of 256 megabytes
 
 ---
 
