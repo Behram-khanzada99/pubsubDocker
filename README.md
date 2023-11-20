@@ -9,7 +9,7 @@ The application is then deployed into Docker container, which is then deployed o
 
 Before deploying the application, ensure you have the following installed:
 - [Redis] (https://redis.uptrace.dev/) installed on your machine
-- [Docker](https://www.docker.com/) installed on your machine.
+- [Docker] (https://www.docker.com/) installed on your machine.
 - [Kubernetes] (https://www.kubernetes.com) installed on your machine.
 
 ## Getting Started
