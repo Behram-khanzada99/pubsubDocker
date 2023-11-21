@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net/http"
 	"sync"
 	"time"
 
 	"github.com/go-redis/redis"
+	"github.com/gorilla/mux"
 )
 
 // Object represents the structure of your data.
@@ -21,7 +23,7 @@ type Object struct {
 func main() {
 	// Initialize a Redis client
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "redis:6379",
+		Addr:     "localhost:6379",
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
@@ -31,11 +33,39 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error connecting to Redis: %v", err)
 	}
+	fmt.Println("connection has been established successfully")
+
+	// Create a new router
+	router := mux.NewRouter()
+
+	// Define REST API routes
+	router.HandleFunc("/publish", func(w http.ResponseWriter, _ *http.Request) {
+		wg := &sync.WaitGroup{}
+		wg.Add(1)
+		go startPublisher(wg, rdb)
+		wg.Wait()
+		w.WriteHeader(http.StatusOK)
+	}).Methods("POST")
+
+	router.HandleFunc("/subscribe", func(w http.ResponseWriter, _ *http.Request) {
+		wg := &sync.WaitGroup{}
+		wg.Add(1)
+		go startSubscriber(wg, rdb)
+		wg.Wait()
+		w.WriteHeader(http.StatusOK)
+	}).Methods("POST")
+
+	// Start the REST API server in a goroutine
+	go func() {
+		log.Println("Starting server on :8080...")
+		log.Fatal(http.ListenAndServe(":8080", router))
+	}()
 
 	// Use a wait group to wait for goroutines to finish
 	var wg sync.WaitGroup
 
 	// Start the publisher goroutine
+	wg.Add(1)
 	go startPublisher(&wg, rdb)
 	fmt.Println("Objects have been published to redis")
 
