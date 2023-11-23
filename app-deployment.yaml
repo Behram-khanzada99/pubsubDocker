@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: "1.31.2 (a92241f79)"
+  labels:
+    io.kompose.service: app
+  name: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: app
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: "1.31.2 (a92241f79)"
+      labels:
+        io.kompose.network/goobjects-default: "true"
+        io.kompose.service: app
+    spec:
+      containers:
+        - image: docker.io/behramkhanzada/my-go-app:v1
+          name: app
+          ports:
+            - containerPort: 8080
+              hostPort: 8081
+              protocol: TCP
+          resources:
+            limits:
+              memory: "256Mi"  # Specify the memory limit for the container
+              cpu: "0.5"       # Specify the CPU limit for the container 
+          volumeMounts:
+            - mountPath: /app/data
+              name: mydata
+      imagePullSecrets:
+        - name: dockerhub-secret
+      restartPolicy: Always
+      volumes:
+        - name: mydata
+          persistentVolumeClaim:
+            claimName: mydata
