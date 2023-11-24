@@ -40,3 +40,18 @@ Redis is deployed with a single replica, and it listens on port 6379.
 
 The Go application service is exposed on port 80 and forwards traffic to port 8080 on the pods labeled app: go-app.
 
+## How to deploy Kubernetes service on Terraform
+- Make sure you have Kubernetes and MiniKube Installed
+- Start MiniKube by running `minikube start` in the terminal.
+- Navigate to the terraform folder in the project directory and execute the following commands:
+  ```
+  terraform init
+  terraform plan
+  terraform apply
+  ```
+- Run the following commands to verify if the deployments and pods are made:
+  - `kubectl get pods` to list all the pods and check their status.
+  - `kubectl get deployments` to list all the deployments.
+
+- Sometimes the status changes from "running" to something like "CrashLoopBackOff" after the application has executed successfully and exited. In order to check if the application has executed successfully run this command: `kubectl logs [pod-name]`
+
